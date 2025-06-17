@@ -14,8 +14,8 @@ const char* ap_ssid = "FREE WIFI";
 const char* ap_password = "12345678";
 
 
-const String botToken = "5789106680:AAHOFB4NgoBzzCORzErqL0LAGBFbO8I85eA";
-const String chatId = "5316471518";
+const String botToken = "TOKEN";
+const String chatId = "USERID";
 
 ESP8266WebServer server(80);
 
