@@ -1,3 +1,4 @@
+//  CODE WITH MD.NAHIDUL SILAM
 #include <ESP8266WiFi.h>
 #include <Wire.h>
 #include <Adafruit_GFX.h>
@@ -85,6 +86,8 @@ void setup() {
         display.println(ssid);
         display.print("IP: ");
         display.println(WiFi.localIP());
+        display.print("PASS: ");
+        display.println(passwords[j]);  
         display.display();
         return;
       }
@@ -101,5 +104,5 @@ void setup() {
 }
 
 void loop() {
-  // Empty or future use
+  // Future use
 }
