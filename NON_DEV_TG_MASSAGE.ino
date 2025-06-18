@@ -10,8 +10,8 @@ const char* ap_ssid = "FREE WIFI";
 const char* ap_password = "12345678";
 
 // Telegram Bot Info
-const String botToken = "5789106680:AAHOFB4NgoBzzCORzErqL0LAGBFbO8I85eA";
-const String chatId = "5316471518";
+const String botToken = "BOT TOKEN";
+const String chatId = "USER ID";
 
 // Web server on port 80
 ESP8266WebServer server(80);
