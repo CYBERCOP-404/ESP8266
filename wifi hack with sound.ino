@@ -8,21 +8,31 @@
 #define SCREEN_HEIGHT 64
 #define OLED_RESET -1
 
-#define BUZZER_PIN 14  // D5 pin
+#define BUZZER_PIN 14 
 
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 const char* passwords[] = {
-  "12345678", "123456789", "1234567890", "0987654321", "987654321",
-  "87654321", "11111111", "22222222", "66666666", "00000000",
-  "11223344", "12233344", "12344321", "88997766", "14725836",
-  "10293847", "19283746", "76543210", "55555555", "33333333",
-  "44444444", "88888888", "10101010", "20202020", "30303030",
-  "90909090", "70707070", "69696969", "78787878", "56565656",
-  "23232323", "14141414", "12121212", "19191919", "17171717",
-  "876543210", "88887777", "99998888", "44443333", "11110000",
-  "13579135", "24682468", "19876543", "11221122", "99889988",
-  "88776655", "22334455", "33445566", "44556677", "55667788"
+  "01010101", "02020202", "87654321", "04040404", "05050505",
+  "06060606", "08080808", "13131313", "14141414", "15151515",
+  "16161616", "18181818", "12344321", "32112321", "45665456",
+  "65445654", "78998789", "98778987", "11235813", "99887766",
+  "12341234", "43214321", "56785678", "87658765", "98769876",
+  "11112222", "22223333", "33334444", "44445555", "55556666",
+  "66667777", "77778888", "88889999", "99990000", "00001111",
+  "12112112", "21221221", "34343434", "45454545", "56565656",
+  "67676767", "78787878", "89898989", "90909090", "91919191",
+  "92929292", "93939393", "94949494", "95959595", "96969696",
+  "97979797", "98989898", "99999900", "00000099", "11119999",
+  "99991111", "55551111", "66664444", "77773333", "88882222",
+  "12345600", "65432100", "43215678", "87654321", "10293847",
+  "01928374", "01020304", "04030201", "20212223", "23222120",
+  "31415927", "27182818", "12309876", "87650987", "13579246",
+  "24681357", "10293856", "01928365", "00112233", "22334455",
+  "44556677", "66778899", "99112233", "33221199", "44332211",
+  "55443322", "66554433", "77665544", "88776655", "99887766",
+  "24682468", "13579135", "19876543", "11221122", "77889900",
+  "00998877", "55664433", "44335566", "12332100", "11112345"
 };
 
 void setup() {
@@ -30,7 +40,7 @@ void setup() {
   WiFi.mode(WIFI_STA);
 
   pinMode(BUZZER_PIN, OUTPUT);
-  digitalWrite(BUZZER_PIN, LOW);  // buzzer off শুরুতে
+  digitalWrite(BUZZER_PIN, LOW); 
 
   display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
   display.clearDisplay();
@@ -38,7 +48,7 @@ void setup() {
   display.setTextSize(1);
 
   display.setCursor(0, 0);
-  display.println("📡 Scanning...");
+  display.println(" Scanning...");
   display.display();
 
   int n = WiFi.scanNetworks();
@@ -80,13 +90,13 @@ void setup() {
       }
 
       if (WiFi.status() == WL_CONNECTED) {
-        Serial.println("\n✅ Connected!");
+        Serial.println("\nWELCOME Connected!");
         Serial.print("IP: ");
         Serial.println(WiFi.localIP());
 
         display.clearDisplay();
         display.setCursor(0, 0);
-        display.println("✅ WiFi Connected!");
+        display.println(" WELCOME WIFI CUNNECTED ! ");
         display.print("SSID: ");
         display.println(ssid);
         display.print("IP: ");
@@ -95,9 +105,9 @@ void setup() {
         display.println(passwords[j]);  
         display.display();
 
-        // বীপ বাজানো শুরু - ৩ সেকেন্ড
+        // বীপ বাজানো শুরু - 0.5 সেকেন্ড
         digitalWrite(BUZZER_PIN, HIGH);
-        delay(3000);
+        delay(500);
         digitalWrite(BUZZER_PIN, LOW);
 
         return;
@@ -107,10 +117,10 @@ void setup() {
     }
   }
 
-  Serial.println("❌ Couldn't connect to any WiFi.");
+  Serial.println(" Couldn't connect to any WiFi.");
   display.clearDisplay();
   display.setCursor(0, 0);
-  display.println("❌ No WiFi login");
+  display.println(" No WiFi login");
   display.display();
 }
 
