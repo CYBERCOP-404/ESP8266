@@ -4,30 +4,26 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 
-// OLED Config
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 64
 #define OLED_RESET -1
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
-// WiFi Setup
 const char* ssid = "ROBOEYES";
 const char* password = "12345678";
 
 ESP8266WebServer server(80);
 
-// Moods (OK renamed to MOOD_OK to avoid conflict)
+// Mood enum (OK renamed to avoid conflict)
 enum MoodType { SAD, GOOD, BAD, ANGRY, EXCITED, MOOD_OK, CUTE, LOVE, ALL };
 MoodType currentMood = GOOD;
 
 void drawEyes(String mood) {
   display.clearDisplay();
 
-  // Common Eyes
-  display.fillRoundRect(20, 20, 30, 30, 8, WHITE); // Left Eye
-  display.fillRoundRect(78, 20, 30, 30, 8, WHITE); // Right Eye
+  display.fillRoundRect(20, 20, 30, 30, 8, WHITE);  // Left Eye
+  display.fillRoundRect(78, 20, 30, 30, 8, WHITE);  // Right Eye
 
-  // Mood-specific expressions
   if (mood == "SAD") {
     display.drawLine(30, 50, 50, 55, WHITE);
     display.drawLine(90, 55, 110, 50, WHITE);
@@ -65,26 +61,87 @@ void handleRoot() {
   String html = R"====(
 <!DOCTYPE html><html><head><meta name="viewport" content="width=device-width">
 <style>
-body{margin:0;background:#000;color:#0f0;font-family:monospace;text-align:center;height:100vh;display:flex;flex-direction:column;justify-content:center}
-.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3vmin;margin:3vmin auto;width:90%}
-button{background:none;border:2px solid #0f0;color:#0f0;font-size:5vmin;padding:3vmin;border-radius:2vmin}
-footer{position:fixed;bottom:0;width:100%;background:#020;color:#0f0;font-size:3.5vmin;padding:2vmin;display:flex;justify-content:space-around;align-items:center;border-top:1px solid #0f0}
-footer a{color:#0f0;text-decoration:none;font-weight:bold}
+body {
+  margin: 0;
+  background: #000;
+  color: #0f0;
+  font-family: monospace;
+  text-align: center;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-top: -20vmin;
+  overflow: hidden;
+}
+nav {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  background: #000;
+  z-index: 999;
+  padding: 1vmin 0;
+}
+nav marquee h2 {
+  margin: 0;
+  font-size: 4vmin;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 3vmin;
+  margin: 3vmin auto;
+  width: 90%;
+}
+button {
+  background: none;
+  border: 2px solid #0f0;
+  color: #0f0;
+  font-size: 5vmin;
+  padding: 3vmin;
+  border-radius: 2vmin;
+}
+footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background: #020;
+  color: #0f0;
+  font-size: 3.5vmin;
+  padding: 2vmin;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  border-top: 1px solid #0f0;
+}
+footer a {
+  color: #0f0;
+  text-decoration: none;
+  font-weight: bold;
+}
 </style></head><body>
-<nav style="margin-top:0px;"><marquee><h2>WELLCOME TO MY WEB PAGE. PLEASE CONTRACT WITH MD.NAHIDUL ISLAM FOR MORE SAPORT . </h2> </marquee></nav>
+<nav>
+  <marquee><h2>WELLCOME TO MY WEB PAGE. PLEASE CONTRACT WITH MD.NAHIDUL ISLAM FOR MORE SAPORT.</h2></marquee>
+</nav>
 <div class="grid">
-<button onclick="sendMood('SAD')">SAD</button><button onclick="sendMood('GOOD')">GOOD</button><button onclick="sendMood('BAD')">BAD</button>
-<button onclick="sendMood('ANGRY')">ANGRY</button><button onclick="sendMood('EXCITED')">EXCITED</button><button onclick="sendMood('OK')">OK</button>
-<button onclick="sendMood('CUTE')">CUTE</button><button onclick="sendMood('LOVE')">LOVE</button><button onclick="sendMood('ALL')">ALL</button>
+<button onclick="sendMood('SAD')">SAD</button>
+<button onclick="sendMood('GOOD')">GOOD</button>
+<button onclick="sendMood('BAD')">BAD</button>
+<button onclick="sendMood('ANGRY')">ANGRY</button>
+<button onclick="sendMood('EXCITED')">EXCITED</button>
+<button onclick="sendMood('OK')">OK</button>
+<button onclick="sendMood('CUTE')">CUTE</button>
+<button onclick="sendMood('LOVE')">LOVE</button>
+<button onclick="sendMood('ALL')">ALL</button>
 </div>
 <footer>
-<button><a href="tel:+8801328276240">Call</a></button>
-<span><a href="https://cybercop-404.github.io/">MD.NAHIDUL ISLAM</a></span>
-<button><a href="https://wa.link/ojiyzz">Msg</a></button>
+  <button><a href="tel:+8801328276240">Call</a></button>
+  <span><a href="https://cybercop-404.github.io/">MD.NAHIDUL ISLAM</a></span>
+  <button><a href="https://wa.link/ojiyzz">Msg</a></button>
 </footer>
 <script>
 function sendMood(mood){
-  fetch("/set?mood="+mood);
+  fetch("/set?mood=" + mood);
 }
 </script>
 </body></html>
@@ -95,8 +152,6 @@ function sendMood(mood){
 void handleSetMood() {
   if (server.hasArg("mood")) {
     String mood = server.arg("mood");
-    Serial.print("Mood: ");
-    Serial.println(mood);
     drawEyes(mood);
     server.send(200, "text/plain", "");
   } else {
@@ -107,7 +162,7 @@ void handleSetMood() {
 void setup() {
   Serial.begin(115200);
   WiFi.softAP(ssid, password);
-  Serial.println("WiFi started");
+  Serial.println("WiFi Started");
   Serial.print("IP: ");
   Serial.println(WiFi.softAPIP());
 
@@ -115,9 +170,10 @@ void setup() {
     Serial.println("OLED not found!");
     while (1);
   }
+
   display.clearDisplay();
   display.display();
-  drawEyes("GOOD"); // Default mood
+  drawEyes("GOOD");
 
   server.on("/", handleRoot);
   server.on("/set", handleSetMood);
