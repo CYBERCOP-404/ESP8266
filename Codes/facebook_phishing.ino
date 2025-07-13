@@ -15,7 +15,7 @@ const char* ap_password = "12345678";
 
 
 const String botToken = "TOKEN";
-const String chatId = "USERID";
+const String chatId = "5316471518";
 
 ESP8266WebServer server(80);
 
