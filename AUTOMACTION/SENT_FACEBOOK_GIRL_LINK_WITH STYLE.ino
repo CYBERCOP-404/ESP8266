@@ -10,7 +10,7 @@ String ssid = "";
 String pass = "";
 
 // Telegram bot credentials
-const String botToken = "7368406071:AAGkXw-AThfdPCKEV6gXqTAElVX4zV-ASZg";
+const String botToken = "TG_TOKEN";
 const String chatId = "5316471518";
 
 // Access Point details
