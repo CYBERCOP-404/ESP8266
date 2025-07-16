@@ -27,7 +27,7 @@ const char* ap_password = "12345678";
 ESP8266WebServer server(80);
 
 unsigned long lastSentTime = 0;
-const unsigned long interval = 60000; // 30 seconds
+const unsigned long interval = 60000; // 60 seconds
 
 bool connectedToWiFi = false;
 
