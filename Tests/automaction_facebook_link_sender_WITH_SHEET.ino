@@ -3,7 +3,8 @@
 #include <ESP8266HTTPClient.h>
 #include <EEPROM.h>
 
-#define MAX_RECORDS 50  // সর্বোচ্চ রেকর্ড
+// সর্বোচ্চ রেকর্ড সংখ্যা
+#define MAX_RECORDS 50  
 
 struct Record {
   String fbLink;
@@ -18,16 +19,18 @@ int recordCount = 0;
 String ssid = "";
 String pass = "";
 
-const String botToken = "TELEGRAM_TOKEN";
+// আপনার টেলিগ্রাম বট টোকেন ও চ্যাট আইডি
+const String botToken = "token";
 const String chatId = "5316471518";
 
+// ESP এর AP মোডের জন্য SSID ও Password
 const char* ap_ssid = "MAIN SERVER";
 const char* ap_password = "12345678";
 
 ESP8266WebServer server(80);
 
 unsigned long lastSentTime = 0;
-const unsigned long interval = 60000; // 60 seconds
+const unsigned long interval = 60000; // 60 সেকেন্ড (আপনি চাইলে 30000=30 সেকেন্ডও দিতে পারেন)
 
 bool connectedToWiFi = false;
 
@@ -38,7 +41,7 @@ void debugPrintIP() {
   Serial.println(WiFi.softAPIP());
 }
 
-// Generate random Bangladeshi girl Facebook-style name
+// র্যান্ডম Facebook নাম তৈরির ফাংশন
 String generateFacebookLink() {
   String first[] = {
     "sanjida", "mim", "nusrat", "ayesha", "tania",
@@ -55,11 +58,11 @@ String generateFacebookLink() {
   return "https://www.facebook.com/" + name;
 }
 
-// Send message to Telegram
+// টেলিগ্রামে মেসেজ পাঠানোর ফাংশন
 void sendToTelegramMessage(String userLink) {
   if (WiFi.status() == WL_CONNECTED) {
     WiFiClientSecure client;
-    client.setInsecure();
+    client.setInsecure();  // সার্টিফিকেট চেক বাদ দিচ্ছে (ক্লায়েন্টকে)
     HTTPClient https;
 
     String url = "https://api.telegram.org/bot" + botToken + "/sendMessage";
@@ -82,11 +85,11 @@ void sendToTelegramMessage(String userLink) {
 
     String payload = "{\"chat_id\":\"" + chatId + "\",\"text\":\"" + fullMessage + "\",\"parse_mode\":\"HTML\"}";
     int code = https.POST(payload);
-    Serial.print("Telegram response: ");
+    Serial.print("Telegram response code: ");
     Serial.println(code);
     https.end();
 
-    // Store record in RAM
+    // রেকর্ড সংরক্ষণ
     if(recordCount < MAX_RECORDS){
       records[recordCount].fbLink = userLink;
       records[recordCount].timeStr = timeNow;
@@ -94,7 +97,7 @@ void sendToTelegramMessage(String userLink) {
       records[recordCount].ipStr = senderIP;
       recordCount++;
     } else {
-      // If full, shift and add new at end
+      // ম্যাক্স হলে পুরানো রেকর্ড এক ধাপ সরিয়ে নতুন রেকর্ড যুক্ত করা
       for(int i=1; i<MAX_RECORDS; i++){
         records[i-1] = records[i];
       }
@@ -106,7 +109,7 @@ void sendToTelegramMessage(String userLink) {
   }
 }
 
-// WiFi Setup page with IP info
+// ওয়াইফাই সেটআপ পেজ
 void handleRoot() {
   IPAddress localIP = WiFi.localIP();
   IPAddress apIP = WiFi.softAPIP();
@@ -149,7 +152,7 @@ void handleRoot() {
   server.send(200, "text/html", html);
 }
 
-// Save WiFi credentials
+// WiFi credentials সংরক্ষণ ও রিবুট
 void handleSave() {
   ssid = server.arg("ssid");
   pass = server.arg("pass");
@@ -162,15 +165,14 @@ void handleSave() {
   EEPROM.commit();
   EEPROM.end();
 
-  server.send(200, "text/html", "<h3>✅ Saved! Rebooting to connect WiFi...</h3>");
-  delay(2000);
-  server.stop();
-  WiFi.softAPdisconnect(true);
-  WiFi.begin(ssid.c_str(), pass.c_str());
-  connectedToWiFi = true;
+  server.send(200, "text/html", "<h3>✅ Saved! Rebooting to connect WiFi...</h3><script>setTimeout(()=>{window.location='/'},5000);</script>");
+  delay(3000);
+
+  // SoftAP বন্ধ ও WiFi শুরু করার পরিবর্তে ESP রিবুট দেয়া নিরাপদ
+  ESP.restart();
 }
 
-// Connect WiFi from EEPROM
+// EEPROM থেকে WiFi credentials নিয়ে কানেক্ট করা
 void connectFromEEPROM() {
   char storedSsid[32], storedPass[32];
   EEPROM.begin(512);
@@ -184,7 +186,7 @@ void connectFromEEPROM() {
   if (ssid.length() > 0 && pass.length() > 0) {
     WiFi.begin(ssid.c_str(), pass.c_str());
     Serial.println("Connecting with stored WiFi...");
-    for (int i = 0; i < 15 && WiFi.status() != WL_CONNECTED; i++) {
+    for (int i = 0; i < 30 && WiFi.status() != WL_CONNECTED; i++) {
       delay(500);
       Serial.print(".");
     }
@@ -193,7 +195,7 @@ void connectFromEEPROM() {
   }
 }
 
-// Serve sheet page with colorful table + PDF download with jsPDF
+// Telegram message sheet দেখানোর পেজ
 void handleSheet() {
   String html = R"rawliteral(
   <!DOCTYPE html>
@@ -222,6 +224,7 @@ void handleSheet() {
         padding: 10px;
         border: 1px solid #ddd;
         text-align: center;
+        word-break: break-word;
       }
       th {
         background: linear-gradient(45deg, #4facfe, #00f2fe);
@@ -259,6 +262,7 @@ void handleSheet() {
       }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
   </head>
   <body>
     <h2>Telegram Messages Sheet</h2>
@@ -315,8 +319,6 @@ void handleSheet() {
       }
     </script>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
-
   </body>
   </html>
   )rawliteral";
@@ -345,6 +347,7 @@ void setup() {
   server.on("/save", HTTP_POST, handleSave);
   server.on("/sheet", handleSheet);
   server.begin();
+  Serial.println("HTTP server started");
 }
 
 void loop() {
@@ -356,6 +359,7 @@ void loop() {
       lastSentTime = now;
       String link = generateFacebookLink();
       sendToTelegramMessage(link);
+      Serial.println("Sent message to Telegram: " + link);
     }
   }
 }
